@@ -1,3 +1,5 @@
+import os
+
 # load env
 from dotenv import load_dotenv
 load_dotenv()
@@ -9,13 +11,16 @@ app = Flask(__name__)
 # db setting
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://linpinhung:password@localhost/flask_testing_dev'
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.secret_key = 'secret string'
+print(os.getenv('FLASK_DEBUG'))
+if os.getenv('FLASK_DEBUG') == '1':
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('LOCAL_DEV_SQLALCHEMY_DATABASE_URI')
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = os.getenv('SECRET_KEY')
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
 
 # migrate setting
 # 這行 import models 可以讓 "flask db migrate" 順利偵測到 models.py 檔
